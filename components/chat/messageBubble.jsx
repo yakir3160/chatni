@@ -4,6 +4,12 @@ import { StyleSheet, Text, View } from 'react-native';
 
 
 export default function MessageBubble({ text, isUser }) {
+  const isHebrew = /[\u0590-\u05FF]/.test(text);
+  const textDirection = {
+    textAlign: isHebrew ? 'right' : 'left',
+    writingDirection: isHebrew ? 'rtl' : 'ltr'
+  };
+
   if (isUser) {
     return (
       <LinearGradient
@@ -12,7 +18,7 @@ export default function MessageBubble({ text, isUser }) {
         end={{ x: 1, y: 1 }}
         style={styles.userBubble}
       >
-        <Text style={[styles.messageText, styles.userText]}>
+        <Text style={[styles.messageText, styles.userText, textDirection]}>
           {text}
         </Text>
       </LinearGradient>
@@ -21,7 +27,7 @@ export default function MessageBubble({ text, isUser }) {
 
   return (
     <View style={styles.aiBubble}>
-      <Text style={[styles.messageText, styles.aiText]}>
+      <Text style={[styles.messageText, styles.aiText, textDirection]}>
         {text}
       </Text>
     </View>
@@ -44,10 +50,10 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   aiBubble: {
-    maxWidth: '90%',
+    maxWidth: '100%',
     padding: 12,
     alignSelf: 'flex-start',
-    direction: 'ltr',
+    
   },
   messageText: {
     fontSize: 16,
