@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { FlatList, KeyboardAvoidingView ,Keyboard} from "react-native";
+import { FlatList, Keyboard, KeyboardAvoidingView, View } from "react-native";
+import { sendChatMessage } from "../../services/geminiSDK";
+import ChatAnimation from "./chatAnimation";
 import ChatInput from "./chatInput";
 import MessageBubble from "./messageBubble";
-import { sendChatMessage } from "../../services/geminiSDK";
+
 
 export default function ChatBody({ }) {
     const [prompt, setPrompt] = useState('');
-    const [messages, setMessages] = useState([
-        { id: '1', text: 'שלום! אני העוזר האישי שלך. איך אני יכול לעזור לך היום?', sender: 'ai' }
-    ]);
+    const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
 
 
@@ -35,14 +35,22 @@ export default function ChatBody({ }) {
         }
     };
     return (
-        <KeyboardAvoidingView style={{ flex: 1, width: '100%' }}>
+        <KeyboardAvoidingView style={{ flex: 1, position: 'relative', width: '100%' }}>
             <FlatList
+                style={{ flex: 1, padding: 8 }}
                 data={messages}
                 renderItem={({ item }) => (
-                    <MessageBubble text={item.text} isUser={item.sender === 'user'} />
+                    <MessageBubble text={item.text}
+                        isUser={item.sender === 'user'}
+                    />
                 )}
                 keyExtractor={item => item.id}
             />
+            <View
+            style={{ flex: 1, alignItems: 'flex-start', justifyContent: 'center', position: 'absolute', bottom: 80, left: 0, right: 0, top: 0 }}>
+                {loading && <ChatAnimation />}
+            </View>
+
             <ChatInput
                 prompt={prompt}
                 setPrompt={setPrompt}
@@ -52,4 +60,4 @@ export default function ChatBody({ }) {
             />
         </KeyboardAvoidingView >
     )
-}
+} 

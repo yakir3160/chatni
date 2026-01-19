@@ -27,7 +27,7 @@ export const generateText = async (prompt) => {
                 contents: [
                     {
                         parts: [
-                            { text: `Configuration: ${basePrompt}\nUser Query: ${prompt}` }
+                            { text: `User Query: ${prompt}` }
                         ]
                     }
                 ]
@@ -44,6 +44,7 @@ export const generateText = async (prompt) => {
 };
 
 let chatSession = null;
+let abortController = null;
 
 export const sendChatMessage = async (input) => {
   try {
@@ -54,15 +55,66 @@ export const sendChatMessage = async (input) => {
         history: [], 
       });
     }
-    const result = await chatSession.sendMessage({
-      message: input + basePrompt
-    
+
+    if (abortController) {
+      abortController.abort();
+    }
+    abortController = new AbortController();
+    const currentSignal = abortController.signal;
+
+    // console.log("Simulating 10s delay...");
+    // await new Promise((resolve, reject) => {
+    //     const timer = setTimeout(resolve, 10000);
+    //     currentSignal.addEventListener('abort', () => {
+    //         clearTimeout(timer);
+    //         reject(new Error('Aborted'));
+    //     });
+    // });
+
+    let result = await chatSession.sendMessage({
+      message: basePrompt + `\nUser Query: ${input}`
+    }, {
+      signal: currentSignal
     });
+
+    if (currentSignal.aborted) {
+      result = "You've stopped the generation.";
+      return result;
+    }
+
+    abortController = null;
     const responseText = result.text; 
     return responseText;
 
   } catch (e) {
+    if (e.name === 'AbortError' || e.message === 'Aborted' || (e.message && e.message.includes('aborted'))) {
+        console.log("Request aborted by user");
+        return "Generation stopped.";
+    }
     console.error("Chat Error:", e);
     throw e;
   }
+};
+
+
+export const stopGeneration = () => {
+  console.log("Stopping generation...");
+  
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+};
+
+export const createAdvisorPrompt =  async (role, formData) => {
+  return `
+    You are a ${role}. Provide personalized travel recommendations based on user input.
+
+    User Input:
+    - Destination: ${formData.destination}
+    - Duration: ${formData.duration}
+    - Budget: ${formData.budget}
+    - Travelers: ${formData.travelers}
+    - Interests: ${formData.interests}
+  `;
 };

@@ -12,6 +12,7 @@ export default function ChatScreen() {
       style={styles.container}
     >
       <ThemedText type="title" style={styles.title}>Chat</ThemedText>
+      <ThemedText type="subtitle"  style={styles.subtitle}>היי איך אני יכול לעזור לך היום?</ThemedText>
       <ChatBody />
     </LinearGradient>
   );
@@ -20,10 +21,16 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
   },
   title: {
     marginTop: 50,
     marginBottom: 20,
     color: appColors.primary,
-  }
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: appColors.primary,
+  },  
 });

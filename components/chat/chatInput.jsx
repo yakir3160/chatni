@@ -2,6 +2,7 @@ import { appColors } from '@/constants/appColors';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { stopGeneration } from '../../services/geminiSDK';
 
 
 export default function ChatInput({ prompt, setPrompt, handleSend, loading }) {
@@ -16,14 +17,19 @@ export default function ChatInput({ prompt, setPrompt, handleSend, loading }) {
         multiline
       />
       <TouchableOpacity 
-        onPress={handleSend}
-        disabled={!prompt || loading}
+        onPress={loading ? stopGeneration : handleSend}
+        disabled={!prompt && !loading}
       >
         <LinearGradient
-          colors={!prompt ? ['#ccc', '#ccc'] : appColors.gradients.primary}
+          colors={!prompt && !loading ? ['#ccc', '#ccc'] : appColors.gradients.primary}
           style={styles.sendButton}
         >
-          <Ionicons name="send" size={20} color="white" />
+          {
+            loading ? (
+              <Ionicons name="square" size={20} color="white" />
+            ) :  <Ionicons name="send" size={20} color="white" />
+          }
+         
         </LinearGradient>
       </TouchableOpacity>
     </View>

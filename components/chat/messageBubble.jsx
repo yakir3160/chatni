@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, Text, View } from 'react-native';
 
 
+
 export default function MessageBubble({ text, isUser }) {
   const isHebrew = /[\u0590-\u05FF]/.test(text);
   const textDirection = {
